@@ -1,0 +1,147 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+class Credit
+{
+    //持有人名
+    public string ownername;
+    //信用卡欠款
+    public double balancedue;
+    //还款日期
+    public int RepaymentDate;
+    //绑定储蓄卡集合
+    public AccountCards Ac;
+
+    public Credit(string ownername, double balancedue, int RepaymentDate, AccountCards Ac)
+    {
+        this.ownername = ownername;
+        this.balancedue = balancedue;
+        this.RepaymentDate = RepaymentDate;
+        this.Ac = Ac;
+    }
+    /// 还款函数
+    public void Repayment()
+    {
+        for (int i = 0; i < Ac.n; i++)
+        {
+            if (this.Ac.cards[i].getDepositMoney() > this.balancedue)
+            {
+                Console.WriteLine("今天是{0}", DateTime.Now);
+                this.Ac.cards[i].setDepositMoney(this.Ac.cards[i].getDepositMoney() - this.balancedue);
+                Console.WriteLine("用户{0}已还款。", this.ownername);
+                Console.WriteLine("还款账户{0}。", this.Ac.cards[i].owernname);
+                Console.WriteLine("还款金额{0}。", this.balancedue);
+                Console.WriteLine("余下金额{0}。", this.Ac.cards[i].getDepositMoney());
+                Console.WriteLine();
+                return;
+            }
+        }
+        Console.WriteLine("今天是{0}", DateTime.Now);
+        Console.WriteLine("还款人{0}", this.ownername);
+        Console.WriteLine("还款金额{0}。", this.balancedue);
+        Console.WriteLine("账户余额不足, 请即时充值。");
+        return;
+    }
+    /// 无需还款函数
+    public void Norepaym()
+    {
+        Console.WriteLine("今天是{0}。", DateTime.Now);
+        Console.WriteLine("用户{0}未到还款日期，无需还款", this.ownername);
+        Console.WriteLine();
+    }
+}
+/// 储蓄卡类
+public class Account
+{
+    public string owernname;
+    private double money;
+    public Account(string owernname, double money)
+    {
+        this.owernname = owernname;
+        this.money = money;
+    }
+    public Account() 
+    {
+    }
+    /// 获取余额
+    public double getDepositMoney()
+    {
+        return this.money;
+    }
+    /// 设置余额
+    public void setDepositMoney(double r)
+    {
+        this.money = r;
+    }
+}
+
+/// 储蓄卡集合类
+public class AccountCards
+{
+    public Account[] cards;
+    public int n;
+    public AccountCards(Account[] cards, int n)
+    {
+        this.n = n;
+        this.cards = cards;
+    }
+}
+/// 扣款委托类
+public class RepayDelegate
+{
+    /// 扣款委托
+    public delegate void RepayMoney();
+    public event RepayMoney Dorepay;
+    /// 执行事件
+    public void NotifyRepay()
+    {
+        if (Dorepay != null)
+        {
+            Console.WriteLine("=========================");
+            Dorepay();
+        }
+    }
+}
+ 
+namespace cprojeket
+{
+    class main
+    {
+        static void Main(string[] args)
+        {
+            //银行还款
+            //1.创建储蓄卡集合
+            Account A1 = new Account("邮政银行", 1000);
+            Account A2 = new Account("农业银行", 2000);
+            Account[] Dc = { A1, A2 };
+            AccountCards cards = new AccountCards(Dc, 2);
+
+            //2.创建信用卡对象
+            Credit C1 = new Credit("小明", 1010, 1, cards);
+            Credit C2 = new Credit("小红", 2000, 22, cards);
+            List<Credit> creditCards = new List<Credit>();
+            creditCards.Add(C1);
+            creditCards.Add(C2);
+            //创建委托
+            RepayDelegate RD = new RepayDelegate();
+            //判断时间
+            foreach (Credit creditCard in creditCards)
+            {
+                if (creditCard.RepaymentDate == int.Parse(DateTime.Now.ToString("yyyy-mm-dd").Split('-')[2]))
+                {
+                    //事件添加
+                    RD.Dorepay += new RepayDelegate.RepayMoney(creditCard.Repayment);
+                }
+                else
+                {
+                    RD.Dorepay += new RepayDelegate.RepayMoney(creditCard.Norepaym);
+                }
+            }
+            //事件执行
+            RD.NotifyRepay();
+            Console.ReadKey();
+        }
+    }
+}
