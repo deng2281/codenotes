@@ -68,9 +68,9 @@ public class Account
     /// 获取余额
     public double getDepositMoney()
     {
-        return this.money;
+        return this.money; 
     }
-    /// 设置余额
+   /// 设置余额
     public void setDepositMoney(double r)
     {
         this.money = r;
@@ -99,7 +99,6 @@ public class RepayDelegate
     {
         if (Dorepay != null)
         {
-            Console.WriteLine("=========================");
             Dorepay();
         }
     }
@@ -113,14 +112,14 @@ namespace cprojeket
         {
             //银行还款
             //1.创建储蓄卡集合
-            Account A1 = new Account("邮政银行", 1000);
-            Account A2 = new Account("农业银行", 2000);
+            Account A1 = new Account("邮政银行", 10000);
+            Account A2 = new Account("农业银行", 20000);
             Account[] Dc = { A1, A2 };
             AccountCards cards = new AccountCards(Dc, 2);
 
             //2.创建信用卡对象
-            Credit C1 = new Credit("小明", 1010, 1, cards);
-            Credit C2 = new Credit("小红", 2000, 22, cards);
+            Credit C1 = new Credit("张三", 4399, 2, cards);
+            Credit C2 = new Credit("李四", 2345, 22, cards);
             List<Credit> creditCards = new List<Credit>();
             creditCards.Add(C1);
             creditCards.Add(C2);
